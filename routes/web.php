@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth'])
@@ -84,6 +86,7 @@ Route::middleware(['auth', 'role:admin,kasir'])->group(function () {
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class);
+    Route::resource('categories', CategoryController::class);
 });
 
 Route::middleware(['auth', 'role:kasir'])->group(function () {
@@ -91,4 +94,3 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
         return 'Riwayat Transaksi Saya';
     })->name('pos.history');
 });
-
