@@ -52,17 +52,21 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Produk berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
+    public function show(Product $product)
     {
-        //
+        $product->load(['transactionDetails.transaction']);
+        
+        $totalTerjual = $product->transactionDetails->sum('qty');
+        
+        $riwayat = $product->transactionDetails()
+            ->with('transaction')
+            ->latest()
+            ->take(10)
+            ->get();
+            
+        return view('master-data.product.show', compact('product', 'totalTerjual', 'riwayat'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Product $product)
     {
         $categories = Category::orderBy('name')->get();
@@ -70,9 +74,6 @@ class ProductController extends Controller
         return view('master-data.product.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateProductRequest $request, Product $product)
     {
         $product->update($request->validated());
@@ -80,9 +81,6 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product)
     {
         $product->delete();
